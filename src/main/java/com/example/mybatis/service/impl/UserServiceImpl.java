@@ -12,9 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import sun.text.SupplementaryCharacterData;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,23 +39,11 @@ public class UserServiceImpl implements IUserService {
         try {
             userList = mapper.selectByUser();
         } catch (Exception e) {
-            log.error("用户服务层错误: {}",JSON.toJSONString(e));
+            log.error("用户服务层查询用户列表服务错误: {}",JSON.toJSONString(e));
             return ResponseDto.failure("服务器错误");
         }
 
-        List<UserDto> userDtoList = new ArrayList<>();
-
-        for (User user : userList
-        ) {
-            UserDto userDto = new UserDto();
-            userDto.setId(user.getId());
-            userDto.setName(user.getName());
-            userDto.setAge(user.getAge());
-            userDto.setSex(user.getSex());
-            userDtoList.add(userDto);
-        }
-
-        return new ResponseDto(userDtoList);
+        return new ResponseDto(CopyUtil.copyList(userList, UserDto.class));
     }
 
     @Override
@@ -94,7 +79,7 @@ public class UserServiceImpl implements IUserService {
             return mapper.updateByUser(user) == 1 ?
                     ResponseDto.success() : ResponseDto.failure("修改用户失败！");
         } catch (Exception e) {
-            log.error("用户服务层错误 :{}",JSON.toJSONString(e));
+            log.error("用户服务层添加用户服务错误 :{}",JSON.toJSONString(e));
             return ResponseDto.failure("服务器错误");
         }
     }
@@ -110,7 +95,7 @@ public class UserServiceImpl implements IUserService {
             return mapper.insert(user) == 1 ?
                     ResponseDto.success() : ResponseDto.failure("添加用户失败！");
         } catch (Exception e) {
-            log.error("用户服务层错误 :{}",JSON.toJSONString(e));
+            log.error("用户服务层修改用户服务错误 :{}",JSON.toJSONString(e));
             return ResponseDto.failure("服务器错误");
         }
 
@@ -119,7 +104,13 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ResponseDto delete(String id) {
-        return null;
+        try {
+            return mapper.deleteByPrimaryKey(id) == 1 ?
+                    ResponseDto.success() : ResponseDto.failure("删除用户失败！");
+        } catch (Exception e) {
+            log.error("用户服务层删除用户服务错误 :{}",JSON.toJSONString(e));
+            return ResponseDto.failure("服务器错误");
+        }
     }
 
 }
