@@ -41,7 +41,7 @@ public class UserServiceImpl implements IUserService {
             userList = mapper.selectByUser();
         } catch (Exception e) {
             log.error("用户服务层查询用户列表服务错误: {}",JSON.toJSONString(e));
-            return ResponseDto.failure("服务器错误");
+            return ResponseDto.serverError();
         }
 
         return new ResponseDto(CopyUtil.copyList(userList, UserDto.class));
@@ -52,7 +52,8 @@ public class UserServiceImpl implements IUserService {
     public ResponseDto save(UserDto userDto) {
 
         if (null == userDto) {
-            return ResponseDto.failure("用户数据为空");
+            log.error("用户数据为空");
+            return ResponseDto.failure();
         }
 
         boolean flag = StringUtils.isEmpty(userDto.getName())
@@ -61,7 +62,7 @@ public class UserServiceImpl implements IUserService {
 
         if (flag) {
             log.error("用户数据不完整: {}", JSON.toJSONString(userDto));
-            return ResponseDto.failure("用户数据不完整");
+            return ResponseDto.failure();
         }
 
         User user = CopyUtil.copy(userDto, User.class);
@@ -79,10 +80,10 @@ public class UserServiceImpl implements IUserService {
     private ResponseDto update(User user) {
         try {
             return mapper.updateByUser(user) == 1 ?
-                    ResponseDto.success() : ResponseDto.failure("修改用户失败！");
+                    ResponseDto.success() : ResponseDto.failure();
         } catch (Exception e) {
             log.error("用户服务层添加用户服务错误 :{}",JSON.toJSONString(e));
-            return ResponseDto.failure("服务器错误");
+            return ResponseDto.serverError();
         }
     }
 
@@ -95,10 +96,10 @@ public class UserServiceImpl implements IUserService {
 
         try {
             return mapper.insert(user) == 1 ?
-                    ResponseDto.success() : ResponseDto.failure("添加用户失败！");
+                    ResponseDto.success() : ResponseDto.failure();
         } catch (Exception e) {
             log.error("用户服务层修改用户服务错误 :{}",JSON.toJSONString(e));
-            return ResponseDto.failure("服务器错误");
+            return ResponseDto.serverError();
         }
 
 
@@ -108,10 +109,10 @@ public class UserServiceImpl implements IUserService {
     public ResponseDto delete(String id) {
         try {
             return mapper.deleteByPrimaryKey(id) == 1 ?
-                    ResponseDto.success() : ResponseDto.failure("删除用户失败！");
+                    ResponseDto.success() : ResponseDto.failure();
         } catch (Exception e) {
             log.error("用户服务层删除用户服务错误 :{}",JSON.toJSONString(e));
-            return ResponseDto.failure("服务器错误");
+            return ResponseDto.serverError();
         }
     }
 
